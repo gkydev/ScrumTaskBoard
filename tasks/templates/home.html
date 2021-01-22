@@ -9,7 +9,7 @@
     <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Trello</a>
+            <a class="navbar-brand" href="#">SCRUMBOARD</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
@@ -23,7 +23,7 @@
             <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                <a class="nav-link" href="#">{{request.user.username}}</a>
+                <a class="nav-link" href="#">{{username}}</a>
                 </li>
                 <li class="nav-item">
                 <a class="nav-link" href="/logout">Logout</a>
@@ -37,10 +37,10 @@
     <div class="container mt-5">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <!-- Button trigger modal -->
-                <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#AddNewJob">
+                <button type="button" class="btn btn-success mb-2" data-bs-toggle="modal" data-bs-target="#AddNewJob">
                     Yeni Proje Ekle
                 </button>
-                <button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#AddTaskModal">
+                <button type="button" class="btn btn-success mb-2" data-bs-toggle="modal" data-bs-target="#AddTaskModal">
                     Yeni Görev Ekle
                 </button>
           </div>
@@ -61,10 +61,13 @@
                                     <li>
                                         <div class="card mt-2 me-2 ms-2 mb-2">
                                             <div class="card-body bg-light">
-                                            
                                             <p class="card-text">{{task.task_desc}}</p>
                                             <p><h7 class="card-subtitle mb-2 text-muted">{{task.task_job}}</h7></p>
                                             <h7 class="card-subtitle mb-2 text-muted">{{task.task_created_date}}</h7>
+                                            <br>
+                                            <br>
+                                            <button class="btn btn-danger" onclick="deleteTask({{task.task_id}})"> Sil </button>
+                                            <a href="updateTask/{{task.task_id}}"><button class="btn btn-primary">Güncelle </button></a>
                                             </div>
                                         </div>
                                     </li>
@@ -101,21 +104,9 @@
                 <td>{{job.job_title}}</td>
                 <td>{{job.job_tech_expert}}</td>
                 <td>{{job.job_status}}</td>
-                <td style="max-width: 35px">
-                <svg xmlns="http://www.w3.org/2000/svg" onclick="deleteJob({{job.job_id}})" class="icon icon-tabler icon-tabler-trash me-0" width="28" height="28" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z"  fill="none"/>
-                <line x1="4" y1="7" x2="20" y2="7" />
-                <line x1="10" y1="11" x2="10" y2="17" />
-                <line x1="14" y1="11" x2="14" y2="17" />
-                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit me-0" width="28" height="28" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path d="M9 7h-3a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-3" />
-                <path d="M9 15h3l8.5 -8.5a1.5 1.5 0 0 0 -3 -3l-8.5 8.5v3" />
-                <line x1="16" y1="5" x2="19" y2="8" />
-                </svg>
+                <td style="max-width: 70px">
+                <button class="btn btn-danger" onclick="deleteJob({{job.job_id}})">Sil </button>
+                <a href="/updateJob/{{job.job_id}}"><button class="btn btn-primary"> Güncelle </button></a>
                 </td>
               </tr>
             {% endfor %}
@@ -156,7 +147,14 @@
     function deleteJob(id){
         var link = "/deleteJob/" + id
         $.get(link, function(data, status){
-            alet(status)
+            alet("Başarıyla silindi")
+        })
+        window.location.reload()
+    }
+    function deleteTask(id){
+        var link = "/deleteTask/" + id
+        $.get(link, function(data, status){
+            alet("Başarıyla silindi")
         })
         window.location.reload()
     }

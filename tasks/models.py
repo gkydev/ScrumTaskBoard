@@ -23,7 +23,7 @@ class Job(models.Model):
     job_title = models.CharField(max_length=50)
     job_tech_expert = models.ForeignKey(TechExpert, on_delete=models.CASCADE)
     job_status = models.ForeignKey(Status, on_delete=models.CASCADE)
-    job_date = models.TimeField(default=now())
+    job_date = models.DateField(default=now())
     job_estimated_time = models.IntegerField()
     job_actual_time = models.IntegerField(default=0)
     job_desc = models.CharField(max_length=1000)

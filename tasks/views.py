@@ -31,7 +31,7 @@ def homePage(request):
     tasks = Task.objects.all()
     temp_list = []
     for task in tasks:
-        temptask = {"task_desc": task.task_desc, "task_job": task.task_job.job_title, "task_tech_expert": task.task_tech_expert.expert_name, "task_status_id": task.task_status_id, "task_created_date": task.task_created_date}
+        temptask = {"task_id":task.task_id,"task_desc": task.task_desc, "task_job": task.task_job.job_title, "task_tech_expert": task.task_tech_expert.expert_name, "task_status_id": task.task_status_id, "task_created_date": task.task_created_date}
         temp_list.append(temptask)
     tasks = temp_list
 
@@ -42,14 +42,15 @@ def homePage(request):
         tempjob = {"job_title": job.job_title, "job_status": job.job_status.status_title, "job_tech_expert": job.job_tech_expert.expert_name, "job_id": job.job_id}
         temp_list.append(tempjob)
     jobs = temp_list
+    username = request.user.username.capitalize()
     context = {
         "experts" : experts,
         "stasuses": statuses,
         "tasks": tasks,
         "jobs": jobs,
-        "date": now()
+        "date": now(),
+        "username": username
     }
-    print(tasks)
     return render(request, 'home.html', context)
 
 #Add Job
@@ -64,8 +65,7 @@ def addJob(request):
                 form.instance.job_status = Status.objects.get(status_id=request.POST.get('status_id'))
                 form.instance.job_estimated_time = calculateEstimatedTime(request.POST.get('job_desc'))
                 form.save()
-                response_text = "Job succesfully added"
-                return JsonResponse({"status": 1, "message": response_text})
+                return JsonResponse({"status": 1, "message": "İşlem Başarılı"})
             except Exception as e:
                 return JsonResponse({"status": 0, "message": "Error : " + str(e)})
         return JsonResponse({"status": 0, "message": "Data Error"})
@@ -83,8 +83,7 @@ def addTask(request):
                 form.instance.task_job = Job.objects.get(job_id=request.POST.get('job_id'))
                 form.instance.task_status = Status.objects.get(status_id=request.POST.get('status_id'))
                 form.save()
-                response_text = "Task succesfully added"
-                return JsonResponse({"status": 1, "message": response_text})
+                return JsonResponse({"status": 1, "message": "İşlem Başarılı"})
             except Exception as e:
                 return JsonResponse({"status": 0, "message": "Error : " + str(e)})
         return JsonResponse({"status": 0, "message": "Data Error"})
@@ -123,6 +122,99 @@ def deleteTask(request, id):
         task_to_delete = Task.objects.get(task_id=id)
         task_to_delete.delete()
         return JsonResponse({"message":"işlem başarılı"})
+
+# Update Task
+def updateTask(request, id):
+    try:
+        task = Task.objects.get(task_id=id)
+    except Exception:
+        return redirect('/home')
+    if request.method == "POST":
+        task = TaskForm(request.POST,instance=task)
+        if task.is_valid:
+            task.save(commit=False)
+            task.instance.task_tech_expert = TechExpert.objects.get(expert_id=(request.POST.get('expert_id')))
+            task.instance.task_status = Status.objects.get(status_id=request.POST.get('status_id'))
+            task.instance.task_job = Job.objects.get(job_id=request.POST.get('job_id'))
+            task.save()
+            return redirect('/home')
+    #Get expert list
+    experts = TechExpert.objects.all()
+    temp_list = []
+    for expert in experts:
+        tempex = {"expert_id": expert.expert_id, "expert_name": expert.expert_name}
+        temp_list.append(tempex)
+    experts = temp_list
+
+    #Get status list
+    statuses = Status.objects.all()
+    temp_list = []
+    for status in statuses:
+        tempstat = {"status_id": status.status_id, "status_title": status.status_title}
+        temp_list.append(tempstat)
+    statuses = temp_list
+    task_data = {"task_id":task.task_id,"task_desc": task.task_desc, "task_job": task.task_job.job_title, "task_tech_expert": task.task_tech_expert.expert_name, "task_status": task.task_status.status_title, "task_created_date": task.task_created_date}
+    
+    #Get Jobs
+    jobs = Job.objects.all()
+    temp_list = []
+    for job in jobs:
+        tempjob = {"job_title": job.job_title, "job_status": job.job_status.status_title, "job_tech_expert": job.job_tech_expert.expert_name, "job_id": job.job_id}
+        temp_list.append(tempjob)
+    jobs = temp_list
+
+    context = {
+        "task": task_data,
+        "stasuses": statuses,
+        "experts": experts,
+        "jobs": jobs,
+        "id": id
+    }  
+    
+    return render(request, "update_task_modal.html", context)
+# Update Job
+def updateJob(request, id):
+    try:
+        job = Job.objects.get(job_id=id)
+    except Exception:
+        return redirect('/home')
+    if request.method == "POST":
+        job = JobForm(request.POST,instance=job)
+        if job.is_valid:
+            job.save(commit=False)
+            job.instance.job_tech_expert = TechExpert.objects.get(expert_id=(request.POST.get('expert_id')))
+            job.instance.job_status = Status.objects.get(status_id=request.POST.get('status_id'))
+            job.instance.job_estimated_time = calculateEstimatedTime(request.POST.get('job_desc'))
+            job.save()
+            return redirect('/home')
+    #Get expert list
+    experts = TechExpert.objects.all()
+    temp_list = []
+    for expert in experts:
+        tempex = {"expert_id": expert.expert_id, "expert_name": expert.expert_name}
+        temp_list.append(tempex)
+    experts = temp_list
+
+    #Get status list
+    statuses = Status.objects.all()
+    temp_list = []
+    for status in statuses:
+        tempstat = {"status_id": status.status_id, "status_title": status.status_title}
+        temp_list.append(tempstat)
+    statuses = temp_list
+    job_data = {"job_id": job.job_id, "job_title": job.job_title, "job_status": job.job_status.status_title, "job_tech_expert": job.job_tech_expert.expert_name, "job_id": job.job_id, "job_estimated_time": job.job_estimated_time, "job_date": job.job_date, "job_desc": job.job_desc, "job_notes": job.job_notes}
+    context = {
+        "job": job_data,
+        "stasuses": statuses,
+        "experts": experts,
+        "id": id
+    }  
+    
+    return render(request, "update_card_modal.html", context)
+    
+
+def indexPage(requst):
+    return redirect('/home')
 
 def test(request):
     return render(request, "test3.html")
