@@ -1,0 +1,80 @@
+          <div class="col-12 border border-secondary">
+            <center><h4 class="my-2 ml-3">Yeni Görev Ekle</h4></center>
+            <hr />
+            <div class="text-danger"></div>
+            <form method="POST" id="NewTask">
+            {% csrf_token %}
+            <div id="taskTodosForm" class="row  p-4 align-middle">
+                <input type="hidden" id="taskId" value="@Model.Id" />
+                <input type="hidden" id="taskTodoId" value="" />
+
+
+
+
+                <div class="col-sm-3 ms-5">
+                    <div class="form-group">
+                        <label>Teknik Uzman</label>
+                        <select class="form-control" name="expert_id">
+                        {% for expert in experts %}
+                        <option value="{{ expert.expert_id }}"> {{expert.expert_name}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-sm-3 ms-5">
+                    <div class="form-group">
+                        <label>Eklenilecek İş</label>
+                        <select class="form-control" name="job_id">
+                        {% for job in jobs %}
+                        <option value="{{ job.job_id }}"> {{job.job_title}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-sm-3 ms-5">
+                    <div class="form-group">
+                        <label>Durum</label>
+                        <select class="form-control" name="status_id">
+                        {% for status in stasuses %}
+                        <option value="{{ status.status_id }}"> {{status.status_title}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                
+                    <div class="form-group ms-5 mt-3">
+                        <label>Açıklama</label>
+                        <textarea class="form-control" style="width: 89%; height: 100%" name="task_desc" required> </textarea>
+                    </div>
+                <center>
+                <div class="align-self-center mt-5">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success mt-4 text-white" style="cursor: pointer" onclick="addTask()">Görev Ekle</button>
+                    </div>
+                </div>
+                </center>
+            </div>
+            </form>
+        </div>
+        <script>
+        console.log(csrftoken)
+        function addTask(){
+            var sendData = $('#NewTask').serializeArray().reduce(function(obj, item) {
+            obj[item.name] = item.value;
+            return obj;
+            
+        }, {});
+            console.log(sendData)
+            var headers = {"X-CSRFToken": csrftoken}
+                $.ajaxSetup({
+                    headers: headers
+                })
+            $.post("/addTask", sendData, function(data, status){
+            var xdata = data.message
+            alert(xdata);
+            });
+        }
+        </script>

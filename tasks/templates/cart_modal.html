@@ -1,0 +1,135 @@
+
+            <script>
+                function getCookie(name) {
+                        let cookieValue = null;
+                        if (document.cookie && document.cookie !== '') {
+                            const cookies = document.cookie.split(';');
+                            for (let i = 0; i < cookies.length; i++) {
+                                const cookie = cookies[i].trim();
+                                // Does this cookie string begin with the name we want?
+                                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;
+                    }
+                    const csrftoken = getCookie('csrftoken');
+                console.log(csrftoken)
+                function addJob(){
+                    var sendData = $('#NewJob').serializeArray().reduce(function(obj, item) {
+                    obj[item.name] = item.value;
+                    return obj;
+                    
+                }, {});
+                    console.log(sendData)
+                    var headers = {"X-CSRFToken": csrftoken}
+                        $.ajaxSetup({
+                            headers: headers
+                        })
+                    $.post("http://127.0.0.1:8000/addJob", sendData, function(data, status){
+                    var xdata = data.message
+                    alert(xdata);
+                    });
+                }
+                $('#addJob').submit(function(e) {
+                console.log("aa")
+                e.preventDefault();
+                // Coding
+    
+                
+                });
+            </script>
+            <div class="container border border-dark p-4">
+                <form method="post" id="NewJob">
+                {% csrf_token %}
+                    <div class="row text-center">
+                        <div class="col-sm-4">
+                            <h1>SB Softsssware</h1>
+                        </div>
+                        <div class="col-sm-4">
+                            <h3 class="bg-dark text-center text-white p-4">TEKNIK KART</h3>
+                        </div>
+                        <div class="col-sm-4">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>Tarih:</th>
+                                    <td><input type="text" class="form-control" disabled value="{{date}}" /></td>
+                                </tr>
+                                <tr>
+                                    <th>Kart No:</th>
+                                    <td><input type="text" value="" disabled class="form-control" /></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <table class="table table-bordered">
+                                <tr>
+            
+                                    <th>Proje No/Adı:</th>
+                                    <td> <span  class="text-danger"></span> <input type="text" class="form-control" name="job_title"/></td>
+                                </tr>
+                                <tr>
+                                    <th>Teknik Uzman:</th>
+                                    <td><span  class="text-danger"></span>
+                                    <select class="form-control" name="expert_id">
+                                    {% for expert in experts %}
+                                    <option value="{{ expert.expert_id }}"> {{expert.expert_name}}</option>
+                                    {% endfor %}
+                                    </select></td>
+                                </tr>
+                                <tr>
+                                    <th>Durum:</th>
+                                    <td>
+                                        <span  class="text-danger"></span>
+                                        <select class="form-control" name="status_id">
+                                        {% for status in stasuses %}
+                                        <option value="{{ status.status_id }}"> {{status.status_title}}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+            
+                        <div class="col-sm-6">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>Tahmini Süre:</th>
+                                    <td>Proje Eklendikten Sonra Hesaplanacaktır</td>
+                                </tr>
+                                <tr>
+                                    <th>Gerçekleşen Süre:</th>
+                                    <td>Proje Bittikten Sonra Hesaplanacaktır</td>
+                                </tr>
+                            </table>
+                        </div>
+            
+                    </div>
+            
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="jobDescription" class="float-left"><strong>İşin Açıklaması:</strong></label>
+                                <textarea class="form-control" style="min-height: 200px" name="job_desc"></textarea>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="jobDescription" class="float-left"><strong>Notlar:</strong></label>
+                                <textarea class="form-control" style="min-height: 100px" name="job_notes"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="addJob()" class="btn btn-primary">Kaydet</button> 
+                    </div>
+                </form>
+            </div>
+            

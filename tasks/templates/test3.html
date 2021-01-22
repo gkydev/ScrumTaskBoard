@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+  $("#test").click(function(){
+    $.get("http://127.0.0.1:8000/test", function(data, status){
+        var xdata = data.message
+      alert("Data: " + xdata);
+    });
+  });
+});
+</script>
+</head>
+<body>
+
+<button id="test">Send an HTTP GET request to a page and get the result back</button>
+
+</body>
+</html>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+$(document).ready(function(){
+    console.log(csrftoken)
+    var sendData = {
+        "job_title": "test title",
+        "job_desc": "test desc",
+        "job_notes": "test notes",
+        "expert_id": 1,
+        "status_id": 1
+    }
+    var headers = {"X-CSRFToken": csrftoken}
+    $.ajaxSetup({
+        headers: headers
+    })
+  $("#test2").click(function(){
+    $.post("http://127.0.0.1:8000/addJob", sendData, function(data, status){
+        
+        var xdata = data.message
+      alert("Data: " + xdata);
+    });
+  });
+});
+$(document).ready(function(){
+    console.log(csrftoken)
+    var sendData2 = {
+        "task_title": "test title",
+        "task_desc": "test desc",
+        "expert_id": 1,
+        "status_id": 1,
+        "job_id": 1
+    }
+    var headers = {"X-CSRFToken": csrftoken}
+    $.ajaxSetup({
+        headers: headers
+    })
+  $("#test3").click(function(){
+    $.post("http://127.0.0.1:8000/addTask", sendData2, function(data, status){
+        
+        var xdata = data.message
+      alert("Data: " + xdata);
+    });
+  });
+});
+</script>
+</head>
+<body>
+
+<button id="test2">post</button>
+<button id="test3">post2</button>
+
+</body>
+</html>
